@@ -1,17 +1,14 @@
 const { getStore } = require("@netlify/blobs");
 
 exports.handler = async (event) => {
-  // Obtenemos el siteID que Netlify ya provee internamente en las variables de entorno
-  const siteID = process.env.SITE_ID || process.env.NETLIFY_SITE_ID;
-  
-  // Inicializamos el almacén pasando el siteID de forma explícita para asegurar la conexión
-  const store = getStore({
-    name: "subastas",
-    siteID: siteID,
-    token: process.env.NETLIFY_AUTH_TOKEN // Opcional, pero ayuda si corre local o restringido
-  });
-
   try {
+    // Inicializamos el almacén pasando explícitamente el Site ID y el Token de Netlify
+    const store = getStore({
+      name: "subastas",
+      siteID: process.env.SITE_ID || process.env.NETLIFY_SITE_ID,
+      token: process.env.NETLIFY_ACCESS_TOKEN || process.env.NETLIFY_AUTH_TOKEN
+    });
+
     if (event.httpMethod === "GET") {
       const { blobs } = await store.list();
       const subastas = await Promise.all(
@@ -39,7 +36,11 @@ exports.handler = async (event) => {
 
     return { statusCode: 405, body: "Método no permitido" };
   } catch (error) {
-    console.error("Error en Netlify Blobs:", error);
-    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+    console.error("Error crítico en Blobs:", error);
+    return { 
+      statusCode: 500, 
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: error.message }) 
+    };
   }
 };
