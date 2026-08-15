@@ -5,36 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor de Subastas</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Usamos Vue.js por CDN para manejar la interfaz de forma limpia en un solo archivo -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
 <body class="bg-gray-100 p-6">
-    <div id="app" class="max-w-6xl mx-auto">
+    <div id="app" class="max-w-7xl mx-auto">
         <h1 class="text-3xl font-bold mb-6 text-gray-800">Gestor de Subastas</h1>
 
         <!-- SELECCIÓN / CREACIÓN DE SUBASTA -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-6 flex gap-4 items-end">
-            <div class="flex-1">
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6 flex flex-col md:flex-row gap-4 items-end">
+            <div class="flex-1 w-full">
                 <label class="block text-sm font-medium text-gray-700">Seleccionar Subasta Existente</label>
                 <select v-model="subastaActiva" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
                     <option :value="null">-- Crear Nueva Subasta --</option>
                     <option v-for="sub in subastas" :value="sub">{{ sub.nombre }}</option>
                 </select>
             </div>
-            <div class="flex-1" v-if="!subastaActiva">
+            <div class="flex-1 w-full" v-if="!subastaActiva">
                 <label class="block text-sm font-medium text-gray-700">Nombre de Nueva Subasta</label>
                 <input v-model="nuevaSubastaNombre" type="text" placeholder="Ej: Subasta Supervielle 10 de Agosto" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
             </div>
-            <button v-if="!subastaActiva" @click="crearSubasta" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Crear y Entrar</button>
+            <button v-if="!subastaActiva" @click="crearSubasta" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 w-full md:w-auto">Crear y Entrar</button>
         </div>
 
         <!-- PANEL DE LA SUBASTA ACTIVA -->
-        <div v-if="subastaActiva" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div v-if="subastaActiva" class="grid grid-cols-1 xl:grid-cols-3 gap-6">
             
             <!-- FORMULARIO DE LOTE -->
-            <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow-md h-fit">
+            <div class="xl:col-span-1 bg-white p-6 rounded-lg shadow-md h-fit">
                 <h2 class="text-xl font-semibold mb-4">{{ modoEdicion ? 'Editar Lote' : 'Agregar Nuevo Lote' }}</h2>
                 <form @submit.prevent="guardarLote" class="space-y-4 text-sm">
+                    <!-- Fila 1 -->
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label>Nº Lote</label>
@@ -46,6 +46,7 @@
                         </div>
                     </div>
                     
+                    <!-- Fila 2 -->
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label>Marca</label>
@@ -57,44 +58,71 @@
                         </div>
                     </div>
 
-                    <div>
-                        <label>Versión</label>
-                        <input v-model="form.version" type="text" required class="w-full border p-1 rounded">
+                    <!-- Fila 3 -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label>Versión</label>
+                            <input v-model="form.version" type="text" required class="w-full border p-1 rounded">
+                        </div>
+                        <div>
+                            <label>Transmisión</label>
+                            <select v-model="form.transmision" class="w-full border p-1 rounded">
+                                <option value="Manual">Manual</option>
+                                <option value="Automático">Automático</option>
+                            </select>
+                        </div>
                     </div>
 
+                    <!-- NUEVOS CAMPOS: Daños y Mercado -->
                     <div>
-                        <label>Transmisión</label>
-                        <select v-model="form.transmision" class="w-full border p-1 rounded">
-                            <option value="Manual">Manual</option>
-                            <option value="Automático">Automático</option>
-                        </select>
+                        <label>Daños que tiene</label>
+                        <input v-model="form.danos" type="text" placeholder="Ej: Choque frontal, falta batería..." class="w-full border p-1 rounded">
                     </div>
 
                     <div class="grid grid-cols-2 gap-2">
                         <div>
+                            <label class="text-xs">Valor Mín. Mercado ($)</label>
+                            <input v-model.number="form.valorMinimoMercado" type="number" class="w-full border p-1 rounded">
+                        </div>
+                        <div>
+                            <label class="text-xs">Valor Máx. Mercado ($)</label>
+                            <input v-model.number="form.valorMaximoMercado" type="number" class="w-full border p-1 rounded">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label>Observación s/ Valor Mínimo</label>
+                        <textarea v-model="form.obsValorMinimo" rows="2" class="w-full border p-1 rounded text-xs" placeholder="Ej: Considerado como base rápida de venta"></textarea>
+                    </div>
+
+                    <div class="border-t pt-3 mt-3"></div>
+
+                    <!-- Fila Gastos y Objetivo -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
                             <label>Deuda Infracciones ($)</label>
-                            <input v-model.number="form.deudaInfracciones" type="number" class="w-full border p-1 rounded">
+                            <input v-model.number="form.deudaInfracciones" type="number" class="w-full border p-1 rounded text-red-700">
                         </div>
                         <div>
                             <label>Deuda Patentes ($)</label>
-                            <input v-model.number="form.deudaPatentes" type="number" class="w-full border p-1 rounded">
+                            <input v-model.number="form.deudaPatentes" type="number" class="w-full border p-1 rounded text-red-700">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label>Costo Reparación ($)</label>
-                            <input v-model.number="form.costoReparacion" type="number" class="w-full border p-1 rounded">
+                            <input v-model.number="form.costoReparacion" type="number" class="w-full border p-1 rounded text-red-700">
                         </div>
                         <div>
-                            <label>Precio Venta Estimado ($)</label>
+                            <label class="font-bold text-green-700">Precio Venta Est. ($)</label>
                             <input v-model.number="form.precioVenta" type="number" class="w-full border p-1 rounded">
                         </div>
                     </div>
 
                     <div class="bg-blue-50 p-3 rounded-md border border-blue-200">
                         <label class="font-bold text-blue-800 block mb-1">Precio Final Objetivo ($)</label>
-                        <p class="text-xs text-blue-600 mb-2">Cuánto querés que te cueste el auto EN TOTAL (martillo + comisiones + arreglos + deudas).</p>
+                        <p class="text-xs text-blue-600 mb-2">Presupuesto TOTAL (martillo + comisiones + arreglos + deudas).</p>
                         <input v-model.number="form.precioObjetivo" type="number" required class="w-full border p-2 rounded text-lg font-bold">
                     </div>
 
@@ -106,7 +134,7 @@
             </div>
 
             <!-- LISTA DE LOTES Y CÁLCULOS -->
-            <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md overflow-x-auto">
+            <div class="xl:col-span-2 bg-white p-6 rounded-lg shadow-md overflow-x-auto h-fit">
                 <h2 class="text-xl font-semibold mb-4">Lotes en {{ subastaActiva.nombre }}</h2>
                 <div v-if="subastaActiva.lotes && subastaActiva.lotes.length === 0" class="text-gray-500">No hay lotes cargados.</div>
                 
@@ -118,21 +146,78 @@
                             <th class="p-2">P. Objetivo</th>
                             <th class="p-2 bg-yellow-100 text-yellow-800 font-bold">MÁX. MARTILLO</th>
                             <th class="p-2 bg-green-100 text-green-800">Ganancia Est.</th>
-                            <th class="p-2">Acciones</th>
+                            <th class="p-2 text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(lote, index) in subastaActiva.lotes" :key="index" class="border-b">
-                            <td class="p-2 font-bold">{{ lote.numero }}</td>
-                            <td class="p-2">{{ lote.marca }} {{ lote.modelo }}<br><span class="text-xs text-gray-500">{{ lote.anio }} | {{ lote.transmision }}</span></td>
-                            <td class="p-2">${{ lote.precioObjetivo?.toLocaleString() }}</td>
-                            <td class="p-2 bg-yellow-50 font-bold text-lg text-yellow-900">${{ calcularMartillo(lote).toLocaleString(undefined, {maximumFractionDigits: 0}) }}</td>
-                            <td class="p-2 bg-green-50 text-green-700 font-bold">${{ calcularGanancia(lote).toLocaleString() }}</td>
-                            <td class="p-2 flex gap-2">
-                                <button @click="editarLote(lote, index)" class="text-blue-600 hover:underline">Editar</button>
-                                <button @click="eliminarLote(index)" class="text-red-600 hover:underline">Borrar</button>
-                            </td>
-                        </tr>
+                        <!-- Usamos <template> para agrupar la fila principal y la del desglose -->
+                        <template v-for="(lote, index) in subastaActiva.lotes" :key="index">
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="p-2 font-bold">{{ lote.numero }}</td>
+                                <td class="p-2">
+                                    {{ lote.marca }} {{ lote.modelo }} {{ lote.version }}<br>
+                                    <span class="text-xs text-gray-500">{{ lote.anio }} | {{ lote.transmision }}</span>
+                                </td>
+                                <td class="p-2">${{ (lote.precioObjetivo || 0).toLocaleString() }}</td>
+                                <td class="p-2 bg-yellow-50 font-bold text-lg text-yellow-900">${{ calcularMartillo(lote).toLocaleString(undefined, {maximumFractionDigits: 0}) }}</td>
+                                <td class="p-2 bg-green-50 text-green-700 font-bold">${{ calcularGanancia(lote).toLocaleString() }}</td>
+                                <td class="p-2">
+                                    <div class="flex flex-col gap-1 items-center">
+                                        <button @click="toggleDesglose(index)" class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded hover:bg-blue-200 font-semibold w-full">
+                                            {{ loteExpandido === index ? 'Ocultar Desglose' : 'Ver Desglose' }}
+                                        </button>
+                                        <div class="flex gap-2 w-full justify-center">
+                                            <button @click="editarLote(lote, index)" class="text-blue-600 hover:underline text-xs">Editar</button>
+                                            <button @click="eliminarLote(index)" class="text-red-600 hover:underline text-xs">Borrar</button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- FILA DE DESGLOSE (Se muestra solo si se hace clic en "Ver Desglose") -->
+                            <tr v-if="loteExpandido === index" class="bg-gray-800 text-white">
+                                <td colspan="6" class="p-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                                        
+                                        <!-- Columna 1: Info Mercado y Daños -->
+                                        <div class="bg-gray-700 p-3 rounded">
+                                            <h4 class="font-bold text-gray-300 border-b border-gray-600 mb-2 pb-1">Mercado y Estado</h4>
+                                            <p><strong>Daños:</strong> {{ lote.danos || 'No especificado' }}</p>
+                                            <p><strong>V. Mínimo:</strong> ${{ (lote.valorMinimoMercado || 0).toLocaleString() }}</p>
+                                            <p><strong>V. Máximo:</strong> ${{ (lote.valorMaximoMercado || 0).toLocaleString() }}</p>
+                                            <p><strong>Obs. V. Mínimo:</strong> {{ lote.obsValorMinimo || '-' }}</p>
+                                            <p class="mt-2 text-green-300"><strong>P. Venta Proyectado:</strong> ${{ (lote.precioVenta || 0).toLocaleString() }}</p>
+                                        </div>
+
+                                        <!-- Columna 2: Gastos Fijos (no dependen del martillo) -->
+                                        <div class="bg-gray-700 p-3 rounded">
+                                            <h4 class="font-bold text-gray-300 border-b border-gray-600 mb-2 pb-1">Gastos Adicionales Fijos</h4>
+                                            <p><strong>Deuda Infracciones:</strong> ${{ (lote.deudaInfracciones || 0).toLocaleString() }}</p>
+                                            <p><strong>Deuda Patentes:</strong> ${{ (lote.deudaPatentes || 0).toLocaleString() }}</p>
+                                            <p><strong>Costos de Reparación:</strong> ${{ (lote.costoReparacion || 0).toLocaleString() }}</p>
+                                            <p><strong>Formularios:</strong> $72,600</p>
+                                            <p><strong>Gestoría (c/ IVA):</strong> $72,600 <span class="text-gray-400">($60k+IVA)</span></p>
+                                            <p><strong>Verif. Policial (c/ IVA):</strong> $212,319 <span class="text-gray-400">($175k+IVA)</span></p>
+                                            <p><strong>Grabado Auto. (c/ IVA):</strong> $184,549 <span class="text-gray-400">($152k+IVA)</span></p>
+                                        </div>
+
+                                        <!-- Columna 3: Desglose de Gastos por Martillo -->
+                                        <div class="bg-gray-700 p-3 rounded border border-yellow-500">
+                                            <h4 class="font-bold text-yellow-400 border-b border-gray-600 mb-2 pb-1">Desglose de Oferta (Martillo)</h4>
+                                            <p class="text-lg font-bold">Martillo: ${{ calcularMartillo(lote).toLocaleString(undefined, {maximumFractionDigits: 0}) }}</p>
+                                            <p><strong>Comisión 10% (+IVA):</strong> ${{ (calcularMartillo(lote) * 0.121).toLocaleString(undefined, {maximumFractionDigits: 0}) }}</p>
+                                            <p><strong>G. Adm. 2.5% (+IVA):</strong> ${{ (calcularMartillo(lote) * 0.03025).toLocaleString(undefined, {maximumFractionDigits: 0}) }}</p>
+                                            <p><strong>Transferencia 3%:</strong> ${{ (calcularMartillo(lote) * 0.03).toLocaleString(undefined, {maximumFractionDigits: 0}) }}</p>
+                                            <div class="mt-2 pt-2 border-t border-gray-500 font-bold text-blue-300">
+                                                Total Exacto de Inversión:<br> 
+                                                ${{ (lote.precioObjetivo || 0).toLocaleString() }}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
                     </tbody>
                 </table>
             </div>
@@ -150,6 +235,7 @@
                     nuevaSubastaNombre: '',
                     modoEdicion: false,
                     indiceEdicion: -1,
+                    loteExpandido: null, // Controla qué lote muestra su desglose
                     form: this.getFormularioVacio()
                 }
             },
@@ -160,6 +246,7 @@
                 getFormularioVacio() {
                     return {
                         numero: '', marca: '', modelo: '', version: '', transmision: 'Manual', anio: null,
+                        danos: '', valorMinimoMercado: 0, valorMaximoMercado: 0, obsValorMinimo: '',
                         deudaInfracciones: 0, deudaPatentes: 0, costoReparacion: 0,
                         precioVenta: 0, precioObjetivo: 0
                     }
@@ -206,11 +293,13 @@
                     this.form = { ...lote };
                     this.modoEdicion = true;
                     this.indiceEdicion = index;
+                    this.loteExpandido = null; // Ocultar desglose al editar
                 },
                 eliminarLote(index) {
                     if (confirm("¿Borrar este lote?")) {
                         this.subastaActiva.lotes.splice(index, 1);
                         this.guardarEnBD();
+                        this.loteExpandido = null;
                     }
                 },
                 cancelarEdicion() {
@@ -218,30 +307,27 @@
                     this.modoEdicion = false;
                     this.indiceEdicion = -1;
                 },
+                toggleDesglose(index) {
+                    // Si ya está abierto, lo cierra. Si no, lo abre.
+                    this.loteExpandido = this.loteExpandido === index ? null : index;
+                },
                 calcularMartillo(lote) {
-                    // Ecuación para despejar el valor del martillo (X)
-                    // PrecioObjetivo = X + CostosVariables(X) + CostosFijos + Deudas + Reparaciones
-                    
                     const deudas = (lote.deudaInfracciones || 0) + (lote.deudaPatentes || 0);
                     const reparaciones = lote.costoReparacion || 0;
                     
-                    // Fijos con IVA
                     const gestoria = 60000 * 1.21;
                     const verifPolicial = 175470 * 1.21;
                     const grabado = 152520 * 1.21;
-                    const formularios = 72600; // Fijo sin IVA especificado
+                    const formularios = 72600; 
                     const totalFijos = gestoria + verifPolicial + grabado + formularios;
                     
-                    // Suma de adiciones que no dependen del martillo
                     const costoExtra = totalFijos + deudas + reparaciones;
                     
-                    // Variables (% sobre X)
-                    const comision = 0.10 * 1.21; // 10% + IVA
-                    const gastosAdm = 0.025 * 1.21; // 2.5% + IVA
-                    const transferencia = 0.03; // 3%
-                    const multiplicadorVariable = 1 + comision + gastosAdm + transferencia; // 1.18125
+                    const comision = 0.10 * 1.21; 
+                    const gastosAdm = 0.025 * 1.21; 
+                    const transferencia = 0.03; 
+                    const multiplicadorVariable = 1 + comision + gastosAdm + transferencia;
 
-                    // X = (Objetivo - Extras) / 1.18125
                     const martillo = ((lote.precioObjetivo || 0) - costoExtra) / multiplicadorVariable;
                     return martillo > 0 ? martillo : 0;
                 },
