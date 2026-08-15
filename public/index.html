@@ -8,133 +8,138 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
         @media print {
-            body { background: white !important; padding: 0 !important; }
+            body { background: white !important; color: black !important; padding: 0 !important; }
             .no-print { display: none !important; }
             .print-shadow-none { box-shadow: none !important; border: none !important; }
+            /* Forzar colores claros en impresión para los contenedores */
+            .print-reset-bg { background-color: white !important; color: black !important; border-color: #ccc !important; }
+            .print-text-dark { color: black !important; }
         }
     </style>
 </head>
-<body class="bg-gray-100 p-6">
+<body class="bg-gray-950 text-gray-100 p-6">
     <div id="app" class="max-w-6xl mx-auto">
-        <h1 class="text-3xl font-bold mb-6 text-gray-800 no-print">Gestor de Subastas</h1>
+        <h1 class="text-3xl font-bold mb-6 text-white no-print flex items-center gap-2">
+            🚗 Gestor de Subastas <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded-full font-normal">Dark Edition</span>
+        </h1>
 
         <!-- SELECCIÓN / CREACIÓN DE SUBASTA -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-6 flex gap-4 items-end no-print">
+        <div class="bg-gray-900 border border-gray-800 p-6 rounded-lg shadow-xl mb-6 flex gap-4 items-end no-print">
             <div class="flex-1">
-                <label class="block text-sm font-medium text-gray-700">Seleccionar Subasta Existente</label>
-                <select v-model="subastaActiva" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                <label class="block text-sm font-medium text-gray-300">Seleccionar Subasta Existente</label>
+                <select v-model="subastaActiva" class="mt-1 block w-full bg-gray-800 border border-gray-700 text-white rounded-md p-2 focus:ring-2 focus:ring-blue-500">
                     <option :value="null">-- Crear Nueva Subasta --</option>
                     <option v-for="sub in subastas" :value="sub">{{ sub.nombre }}</option>
                 </select>
             </div>
             <div class="flex-1" v-if="!subastaActiva">
-                <label class="block text-sm font-medium text-gray-700">Nombre de Nueva Subasta</label>
-                <input v-model="nuevaSubastaNombre" type="text" placeholder="Ej: Subasta Supervielle 10 de Agosto" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                <label class="block text-sm font-medium text-gray-300">Nombre de Nueva Subasta</label>
+                <input v-model="nuevaSubastaNombre" type="text" placeholder="Ej: Subasta Supervielle 10 de Agosto" class="mt-1 block w-full bg-gray-800 border border-gray-700 text-white rounded-md p-2">
             </div>
-            <button v-if="!subastaActiva" @click="crearSubasta" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Crear y Entrar</button>
+            <button v-if="!subastaActiva" @click="crearSubasta" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-500 font-semibold transition-colors">Crear y Entrar</button>
         </div>
 
         <!-- PANEL DE LA SUBASTA ACTIVA -->
         <div v-if="subastaActiva" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             <!-- FORMULARIO DE LOTE -->
-            <div class="lg:col-span-1 bg-white p-6 rounded-lg shadow-md h-fit no-print">
-                <h2 class="text-xl font-semibold mb-4">{{ modoEdicion ? 'Editar Lote' : 'Agregar Nuevo Lote' }}</h2>
+            <div class="lg:col-span-1 bg-gray-900 border border-gray-800 p-6 rounded-lg shadow-xl h-fit no-print">
+                <h2 class="text-xl font-semibold mb-4 text-blue-400">{{ modoEdicion ? 'Editar Lote' : 'Agregar Nuevo Lote' }}</h2>
                 <form @submit.prevent="guardarLote" class="space-y-4 text-sm">
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label>Nº Lote</label>
-                            <input v-model="form.numero" type="text" required class="w-full border p-1 rounded">
+                            <label class="text-gray-400">Nº Lote</label>
+                            <input v-model="form.numero" type="text" required class="w-full bg-gray-800 border border-gray-700 text-white p-1.5 rounded">
                         </div>
                         <div>
-                            <label>Año</label>
-                            <input v-model.number="form.anio" type="number" required class="w-full border p-1 rounded">
+                            <label class="text-gray-400">Año</label>
+                            <input v-model.number="form.anio" type="number" required class="w-full bg-gray-800 border border-gray-700 text-white p-1.5 rounded">
                         </div>
                     </div>
                     
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label>Marca</label>
-                            <input v-model="form.marca" type="text" required class="w-full border p-1 rounded">
+                            <label class="text-gray-400">Marca</label>
+                            <input v-model="form.marca" type="text" required class="w-full bg-gray-800 border border-gray-700 text-white p-1.5 rounded">
                         </div>
                         <div>
-                            <label>Modelo</label>
-                            <input v-model="form.modelo" type="text" required class="w-full border p-1 rounded">
+                            <label class="text-gray-400">Modelo</label>
+                            <input v-model="form.modelo" type="text" required class="w-full bg-gray-800 border border-gray-700 text-white p-1.5 rounded">
                         </div>
                     </div>
 
                     <div>
-                        <label>Versión</label>
-                        <input v-model="form.version" type="text" required class="w-full border p-1 rounded">
+                        <label class="text-gray-400">Versión</label>
+                        <input v-model="form.version" type="text" required class="w-full bg-gray-800 border border-gray-700 text-white p-1.5 rounded">
                     </div>
 
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label>Transmisión</label>
-                            <select v-model="form.transmision" class="w-full border p-1 rounded">
+                            <label class="text-gray-400">Transmisión</label>
+                            <select v-model="form.transmision" class="w-full bg-gray-800 border border-gray-700 text-white p-1.5 rounded">
                                 <option value="Manual">Manual</option>
                                 <option value="Automático">Automático</option>
                             </select>
                         </div>
                         <div>
-                            <label>Deuda Infracciones ($)</label>
-                            <input v-model.number="form.deudaInfracciones" type="number" class="w-full border p-1 rounded">
+                            <label class="text-gray-400">Deuda Infracc. ($)</label>
+                            <input v-model.number="form.deudaInfracciones" type="number" class="w-full bg-gray-800 border border-gray-700 text-white p-1.5 rounded">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label>Deuda Patentes ($)</label>
-                            <input v-model.number="form.deudaPatentes" type="number" class="w-full border p-1 rounded">
+                            <label class="text-gray-400">Deuda Patentes ($)</label>
+                            <input v-model.number="form.deudaPatentes" type="number" class="w-full bg-gray-800 border border-gray-700 text-white p-1.5 rounded">
                         </div>
                         <div>
-                            <label>Costo Reparación ($)</label>
-                            <input v-model.number="form.costoReparacion" type="number" class="w-full border p-1 rounded">
+                            <label class="text-gray-400">Costo Reparación ($)</label>
+                            <input v-model.number="form.costoReparacion" type="number" class="w-full bg-gray-800 border border-gray-700 text-white p-1.5 rounded">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-3 gap-2">
                         <div>
-                            <label>Val. Mínimo</label>
-                            <input v-model.number="form.valorMin" type="number" class="w-full border p-1 rounded">
+                            <label class="text-gray-400">Val. Mínimo</label>
+                            <input v-model.number="form.valorMin" type="number" class="w-full bg-gray-800 border border-gray-700 text-white p-1.5 rounded">
                         </div>
                         <div>
-                            <label>Val. Máximo</label>
-                            <input v-model.number="form.valorMax" type="number" class="w-full border p-1 rounded">
+                            <label class="text-gray-400">Val. Máximo</label>
+                            <input v-model.number="form.valorMax" type="number" class="w-full bg-gray-800 border border-gray-700 text-white p-1.5 rounded">
                         </div>
                         <div>
-                            <label>P. Venta Est.</label>
-                            <input v-model.number="form.precioVenta" type="number" class="w-full border p-1 rounded">
+                            <label class="text-gray-400">P. Venta Est.</label>
+                            <input v-model.number="form.precioVenta" type="number" class="w-full bg-gray-800 border border-gray-700 text-white p-1.5 rounded">
                         </div>
                     </div>
 
                     <div>
-                        <label>Obs. Valor Mínimo / Estado</label>
-                        <input v-model="form.obsMin" type="text" class="w-full border p-1 rounded">
+                        <label class="text-gray-400">Obs. Valor Mínimo / Estado</label>
+                        <input v-model="form.obsMin" type="text" class="w-full bg-gray-800 border border-gray-700 text-white p-1.5 rounded">
                     </div>
 
                     <div>
-                        <label>Daños</label>
-                        <textarea v-model="form.daños" class="w-full border p-1 rounded" rows="2"></textarea>
+                        <label class="text-gray-400">Daños</label>
+                        <textarea v-model="form.daños" class="w-full bg-gray-800 border border-gray-700 text-white p-1.5 rounded" rows="2"></textarea>
                     </div>
 
-                    <div class="bg-blue-50 p-3 rounded-md border border-blue-200">
-                        <label class="font-bold text-blue-800 block mb-1">Precio Final Objetivo ($)</label>
-                        <input v-model.number="form.precioObjetivo" type="number" required class="w-full border p-2 rounded text-lg font-bold">
+                    <div class="bg-blue-950/60 border border-blue-800/80 p-3 rounded-md">
+                        <label class="font-bold text-blue-300 block mb-1">Precio Final Objetivo ($)</label>
+                        <input v-model.number="form.precioObjetivo" type="number" required class="w-full bg-gray-900 border border-blue-600 text-white p-2 rounded text-lg font-bold">
                     </div>
 
-                    <button type="submit" class="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 font-bold">
+                    <button type="submit" class="w-full bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-500 font-bold transition-colors">
                         {{ modoEdicion ? 'Actualizar Lote' : 'Guardar Lote' }}
                     </button>
-                    <button type="button" v-if="modoEdicion" @click="cancelarEdicion" class="w-full mt-2 bg-gray-400 text-white px-4 py-2 rounded-md">Cancelar</button>
+                    <button type="button" v-if="modoEdicion" @click="cancelarEdicion" class="w-full mt-2 bg-gray-700 text-gray-200 px-4 py-2 rounded-md hover:bg-gray-600">Cancelar</button>
                 </form>
             </div>
 
             <!-- LISTA DE LOTES Y CÁLCULOS -->
-            <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md overflow-x-auto print-shadow-none">
+            <div class="lg:col-span-2 bg-gray-900 border border-gray-800 p-6 rounded-lg shadow-xl overflow-x-auto print-shadow-none print-reset-bg">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-semibold">Lotes en {{ subastaActiva.nombre }}</h2>
-                    <button @click="imprimirResumen" class="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-black text-sm flex items-center gap-2 no-print">
+                    <h2 class="text-xl font-semibold text-gray-100 print-text-dark">Lotes en {{ subastaActiva.nombre }}</h2>
+                    <button @click="imprimirResumen" class="bg-gray-800 border border-gray-700 text-gray-200 px-4 py-2 rounded-md hover:bg-gray-700 text-sm flex items-center gap-2 no-print transition-colors">
                         🖨️ Imprimir Resumen / PDF
                     </button>
                 </div>
@@ -142,65 +147,67 @@
                 <div v-if="subastaActiva.lotes && subastaActiva.lotes.length === 0" class="text-gray-500">No hay lotes cargados.</div>
                 
                 <table v-else class="min-w-full text-sm text-left">
-                    <thead class="bg-gray-100 text-gray-700">
+                    <thead class="bg-gray-800 text-gray-300 print-reset-bg">
                         <tr>
                             <th class="p-2">Lote</th>
                             <th class="p-2">Vehículo</th>
                             <th class="p-2">P. Objetivo</th>
-                            <th class="p-2 bg-yellow-100 text-yellow-800 font-bold">MÁX. MARTILLO</th>
-                            <th class="p-2 bg-green-100 text-green-800">Ganancia Est.</th>
+                            <th class="p-2 bg-amber-950/60 text-amber-300 font-bold print-reset-bg">MÁX. MARTILLO</th>
+                            <th class="p-2 bg-emerald-950/60 text-emerald-300 print-reset-bg">Ganancia Est.</th>
                             <th class="p-2 no-print">Acciones</th>
                         </tr>
                     </thead>
-                    <template v-for="(lote, index) in subastaActiva.lotes" :key="index">
-                        <tr class="border-b">
-                            <td class="p-2 font-bold">{{ lote.numero }}</td>
-                            <td class="p-2">{{ lote.marca }} {{ lote.modelo }} <span class="text-xs text-gray-500">({{ lote.anio }} - {{ lote.transmision }})</span></td>
-                            <td class="p-2">${{ lote.precioObjetivo?.toLocaleString() }}</td>
-                            <td class="p-2 bg-yellow-50 font-bold text-lg text-yellow-900">${{ calcularMartillo(lote).toLocaleString(undefined, {maximumFractionDigits: 0}) }}</td>
-                            <td class="p-2 bg-green-50 text-green-700 font-bold">${{ calcularGanancia(lote).toLocaleString() }}</td>
-                            <td class="p-2 flex gap-2 no-print">
-                                <button @click="editarLote(lote, index)" class="text-blue-600 hover:underline">Editar</button>
-                                <button @click="eliminarLote(index)" class="text-red-600 hover:underline">Borrar</button>
-                                <button @click="toggleDesglose(index)" class="text-purple-600 hover:underline font-semibold">
-                                    {{ loteExpandido === index ? 'Ocultar Desglose' : 'Ver Desglose' }}
-                                </button>
-                            </td>
-                        </tr>
-                        <!-- FILA DE DESGLOSE EXPANDIBLE -->
-                        <tr v-if="loteExpandido === index" class="bg-gray-50 border-b">
-                            <td colspan="6" class="p-4">
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs bg-white p-4 rounded border shadow-inner">
-                                    <div>
-                                        <p class="font-bold text-gray-700 mb-1">📋 Mercado y Estado</p>
-                                        <p><strong>Val. Mínimo:</strong> ${{ lote.valorMin?.toLocaleString() }}</p>
-                                        <p><strong>Val. Máximo:</strong> ${{ lote.valorMax?.toLocaleString() }}</p>
-                                        <p><strong>Obs. Mín:</strong> {{ lote.obsMin || 'N/D' }}</p>
-                                        <p><strong>Daños:</strong> {{ lote.daños || 'Ninguno' }}</p>
+                    <tbody>
+                        <template v-for="(lote, index) in subastaActiva.lotes" :key="index">
+                            <tr class="border-b border-gray-800 hover:bg-gray-800/50">
+                                <td class="p-2 font-bold text-white print-text-dark">{{ lote.numero }}</td>
+                                <td class="p-2 text-gray-200 print-text-dark">{{ lote.marca }} {{ lote.modelo }} <span class="text-xs text-gray-400">({{ lote.anio }} - {{ lote.transmision }})</span></td>
+                                <td class="p-2 text-gray-200 print-text-dark">${{ lote.precioObjetivo?.toLocaleString() }}</td>
+                                <td class="p-2 bg-amber-950/30 font-bold text-base text-amber-400 print-reset-bg">${{ calcularMartillo(lote).toLocaleString(undefined, {maximumFractionDigits: 0}) }}</td>
+                                <td class="p-2 bg-emerald-950/30 text-emerald-400 font-bold print-reset-bg">${{ calcularGanancia(lote).toLocaleString() }}</td>
+                                <td class="p-2 flex gap-2 no-print">
+                                    <button @click="editarLote(lote, index)" class="text-blue-400 hover:underline">Editar</button>
+                                    <button @click="eliminarLote(index)" class="text-red-400 hover:underline">Borrar</button>
+                                    <button @click="toggleDesglose(index)" class="text-purple-400 hover:underline font-semibold">
+                                        {{ loteExpandido === index ? 'Ocultar' : 'Desglose' }}
+                                    </button>
+                                </td>
+                            </tr>
+                            <!-- FILA DE DESGLOSE EXPANDIBLE -->
+                            <tr v-if="loteExpandido === index" class="bg-gray-950 border-b border-gray-800">
+                                <td colspan="6" class="p-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs bg-gray-900 border border-gray-800 p-4 rounded shadow-inner text-gray-300">
+                                        <div>
+                                            <p class="font-bold text-blue-400 mb-1">📋 Mercado y Estado</p>
+                                            <p><strong>Val. Mínimo:</strong> ${{ lote.valorMin?.toLocaleString() }}</p>
+                                            <p><strong>Val. Máximo:</strong> ${{ lote.valorMax?.toLocaleString() }}</p>
+                                            <p><strong>Obs. Mín:</strong> {{ lote.obsMin || 'N/D' }}</p>
+                                            <p><strong>Daños:</strong> {{ lote.daños || 'Ninguno' }}</p>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-amber-400 mb-1">🛠️ Gastos Fijos & Deudas</p>
+                                            <p><strong>Deuda Infracciones:</strong> ${{ lote.deudaInfracciones?.toLocaleString() }}</p>
+                                            <p><strong>Deuda Patentes:</strong> ${{ lote.deudaPatentes?.toLocaleString() }}</p>
+                                            <p><strong>Costo Reparación:</strong> ${{ lote.costoReparacion?.toLocaleString() }}</p>
+                                            <p><strong>Formularios (Fijo):</strong> $72.600</p>
+                                            <p><strong>Gestoría (+IVA):</strong> $72.600</p>
+                                            <p><strong>Verificación Policial (+IVA):</strong> $212.318,70</p>
+                                            <p><strong>Grabado Autopartes (+IVA):</strong> $184.549,20</p>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-emerald-400 mb-1">📊 Desglose del Martillo</p>
+                                            <p class="text-sm font-bold text-amber-300">Valor Martillo Máx: ${{ calcularMartillo(lote).toLocaleString(undefined, {maximumFractionDigits: 0}) }}</p>
+                                            <hr class="my-1 border-gray-700">
+                                            <p><strong>Comisión (10%+IVA):</strong> ${{ (calcularMartillo(lote) * 0.121).toLocaleString(undefined, {maximumFractionDigits: 0}) }}</p>
+                                            <p><strong>Gastos Adm. (2.5%+IVA):</strong> ${{ (calcularMartillo(lote) * 0.03025).toLocaleString(undefined, {maximumFractionDigits: 0}) }}</p>
+                                            <p><strong>Transferencia (3%):</strong> ${{ (calcularMartillo(lote) * 0.03).toLocaleString(undefined, {maximumFractionDigits: 0}) }}</p>
+                                            <p class="mt-2 text-emerald-400 font-bold"><strong>Ganancia Estimada Venta:</strong> ${{ calcularGanancia(lote).toLocaleString() }}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p class="font-bold text-gray-700 mb-1">🛠️ Gastos Fijos & Deudas</p>
-                                        <p><strong>Deuda Infracciones:</strong> ${{ lote.deudaInfracciones?.toLocaleString() }}</p>
-                                        <p><strong>Deuda Patentes:</strong> ${{ lote.deudaPatentes?.toLocaleString() }}</p>
-                                        <p><strong>Costo Reparación:</strong> ${{ lote.costoReparacion?.toLocaleString() }}</p>
-                                        <p><strong>Formularios (Fijo):</strong> $72.600</p>
-                                        <p><strong>Gestoría (+IVA):</strong> $72.600</p>
-                                        <p><strong>Verificación Policial (+IVA):</strong> $212.318,70</p>
-                                        <p><strong>Grabado Autopartes (+IVA):</strong> $184.549,20</p>
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-gray-700 mb-1">📊 Desglose del Martillo</p>
-                                        <p class="text-sm font-bold text-yellow-800">Valor Martillo Máx: ${{ calcularMartillo(lote).toLocaleString(undefined, {maximumFractionDigits: 0}) }}</p>
-                                        <hr class="my-1">
-                                        <p><strong>Comisión (10%+IVA):</strong> ${{ (calcularMartillo(lote) * 0.121).toLocaleString(undefined, {maximumFractionDigits: 0}) }}</p>
-                                        <p><strong>Gastos Adm. (2.5%+IVA):</strong> ${{ (calcularMartillo(lote) * 0.03025).toLocaleString(undefined, {maximumFractionDigits: 0}) }}</p>
-                                        <p><strong>Transferencia (3%):</strong> ${{ (calcularMartillo(lote) * 0.03).toLocaleString(undefined, {maximumFractionDigits: 0}) }}</p>
-                                        <p class="mt-2 text-green-700 font-bold"><strong>Ganancia Estimada Venta:</strong> ${{ calcularGanancia(lote).toLocaleString() }}</p>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </template>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
                 </table>
             </div>
         </div>
